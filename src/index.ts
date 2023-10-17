@@ -1,14 +1,15 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { MapControls } from "three/examples/jsm/controls/MapControls";
 import AssetManager from "./assetManager";
 import { hud } from "./hud";
+import DebugTools from "./debugTools";
 
 window.scene = new THREE.Scene();
 window.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 
 export const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-export const controls = new OrbitControls(camera, renderer.domElement);
+export const controls = new MapControls(camera, renderer.domElement);
 export let currentBlock: string = "";
 
 
@@ -43,6 +44,7 @@ const animate: FrameRequestCallback = (delta) => {
 
 
 hud.init();
+DebugTools.init();
 
 AssetManager.downloadCSXFiles()
 

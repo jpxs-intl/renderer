@@ -6,7 +6,7 @@ import { hud } from "../hud";
 
 export default class BlockRenderer {
 
-    public static renderBlock(block: BlockFile, blockName: string, group?: THREE.Group, textures?: string[] ,offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
+    public static renderBlock(block: BlockFile, blockName: string, group?: THREE.Group, textures?: string[], offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0), name?: string) {
 
         if (!group) {
             const oldGroup = window.scene.getObjectByName("currentRender")
@@ -97,6 +97,7 @@ export default class BlockRenderer {
                     side: THREE.DoubleSide,
                 });
                 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+                planeMesh.name = `p: ${index} | b: ${blockName} | ${name}`;
                 boxGroup.add(planeMesh);
             })
 
