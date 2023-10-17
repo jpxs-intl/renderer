@@ -22,7 +22,7 @@ export default class SBBFileParser {
 
     let offset = 96;
     let textures: string[] = [];
-    
+
     for (let i = 0; i < textureQuantity; i++) {
       textures.push(ParserUtils.getString(dataView, offset, 64)) // 64 byte strings;
       offset += 64;
@@ -84,10 +84,10 @@ export default class SBBFileParser {
           const edgeZ = dataView.getUint32(offset + 16, true); // 20
           const floor = dataView.getUint32(offset + 20, true); // 24
 
-          if(Math.abs(block & 0xE0000000) == 0x80000000)
+          if (Math.abs(block & 0xE0000000) == 0x80000000)
             block = specialBlocks[block & 0x3FF]
 
-          if(Math.abs(interiorBlock & 0xE0000000) == 0x80000000)
+          if (Math.abs(interiorBlock & 0xE0000000) == 0x80000000)
             interiorBlock = specialBlocks[interiorBlock & 0x3FF]
 
           // console.log(dataView.getUint32(offset + 8, true), interiorBlock.toString(16), block.toString(16))
@@ -112,20 +112,19 @@ export default class SBBFileParser {
           const itemSet = itemSets[dataView.getUint32(offset + 56, true)];
           offset += 4;
 
-          if (!tiles[w]) tiles[w] = [];
-          if (!tiles[w][l]) tiles[w][l] = [];
-          if (!tiles[w][l][h])
-            tiles[w][l][h] = {
-              block,
-              interiorBlock,
-              buildBlock,
-              edgeX,
-              edgeZ,
-              floor,
-              textures: tileTextures as [string, string, string, string, string, string, string, string],
-              interiorTextures: interiorTextures as [string, string, string, string, string, string, string, string],
-              itemSet,
-            };
+          if (!tiles[h]) tiles[h] = [];
+          if (!tiles[h][l]) tiles[h][l] = [];
+          tiles[h][l][w] = {
+            block,
+            interiorBlock,
+            buildBlock,
+            edgeX,
+            edgeZ,
+            floor,
+            textures: tileTextures as [string, string, string, string, string, string, string, string],
+            interiorTextures: interiorTextures as [string, string, string, string, string, string, string, string],
+            itemSet,
+          };
         }
       }
     }

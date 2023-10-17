@@ -6,15 +6,17 @@ import { hud } from "../hud";
 
 export default class BlockRenderer {
 
-    public static renderBlock(block: BlockFile, blockName: string) {
+    public static renderBlock(block: BlockFile, blockName: string, group?: THREE.Group, textures?: string[] ,offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
 
-        const oldGroup = window.scene.getObjectByName("currentRender")
-        if (oldGroup) {
-            window.scene.remove(oldGroup)
+        if (!group) {
+            const oldGroup = window.scene.getObjectByName("currentRender")
+            if (oldGroup) {
+                window.scene.remove(oldGroup)
+            }
+
+            group = new THREE.Group()
+            group.name = "currentRender"
         }
-
-        const group = new THREE.Group()
-        group.name = "currentRender"
 
         const colors = [
             0xff0000,
@@ -23,13 +25,6 @@ export default class BlockRenderer {
             0xffff00,
             0xff00ff,
             0x00ffff,
-            0x7f0000,
-            0x007f00,
-            0x00007f,
-            0x7f7f00,
-            0x7f007f,
-            0x007f7f,
-            0x7f7f7f,
         ]
 
         // for (const surface of block.surfaces) {
@@ -79,21 +74,23 @@ export default class BlockRenderer {
 
             const planeGeometries = planeIds.map((planeId) => {
                 const planeGeometry = new THREE.PlaneGeometry(1, 1);
-              
+
                 const verts = new Float32Array(12);
                 let vertIndex = 0;
                 planeId.forEach((vertexId) => {
-                    verts[vertIndex] = box.vertices[vertexId][0];
-                    verts[vertIndex + 1] = box.vertices[vertexId][1];
-                    verts[vertIndex + 2] = box.vertices[vertexId][2];
+                    verts[vertIndex] = box.vertices[vertexId][0] + offset.x;
+                    verts[vertIndex + 1] = box.vertices[vertexId][1] + offset.y;
+                    verts[vertIndex + 2] = box.vertices[vertexId][2] + offset.z;
                     vertIndex += 3;
                 })
                 planeGeometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
                 return planeGeometry;
             });
 
+
+
             const boxGroup = new THREE.Group();
-            
+
             planeGeometries.forEach((planeGeometry, index) => {
                 const planeMaterial = new THREE.MeshStandardMaterial({
                     color: colors[index],
@@ -105,45 +102,7 @@ export default class BlockRenderer {
 
             group.add(boxGroup);
 
-            box.vertices.forEach((vertex) => {
-                const vertexMarker = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-                const vertexMarkerMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x00ff00,
-                });
-                const vertexMarkerMesh = new THREE.Mesh(vertexMarker, vertexMarkerMaterial);
-                vertexMarkerMesh.position.set(
-                    vertex[0],
-                    vertex[1],
-                    vertex[2]
-                );
-                // group.add(vertexMarkerMesh);
-            })
 
-            // let highestVertex = [-Infinity, -Infinity, -Infinity];
-            // let lowestVertex = [Infinity, Infinity, Infinity];
-            // for (const vertex of box.vertices) {
-            //   if (vertex[0] > highestVertex[0] || vertex[1] > highestVertex[1] || vertex[2] > highestVertex[2]) {
-            //     highestVertex = [...vertex];
-            //   }
-            //   if (vertex[0] < lowestVertex[0] || vertex[1] < lowestVertex[1] || vertex[2] < lowestVertex[2]) {
-            //     lowestVertex = [...vertex];
-            //   }
-            // }
-            // let minVec = new THREE.Vector3(lowestVertex[0], lowestVertex[1], lowestVertex[2]);
-            // let maxVec = new THREE.Vector3(highestVertex[0], highestVertex[1], highestVertex[2]);
-            // let dimensions = new THREE.Vector3().subVectors(maxVec, minVec);
-            // //if(tile.buildBlock.search("stairwell") != -1)
-            // //console.log(maxVec, minVec, tile.buildBlock)
-            // const boxGeo = new THREE.BoxGeometry(dimensions.x, dimensions.y, dimensions.z);
-            // const matrix = new THREE.Matrix4().setPosition(
-            //   dimensions.addVectors(minVec, maxVec).multiplyScalar(0.5).add(adjustVec)
-            // );
-            // boxGeo.applyMatrix4(matrix);
-            // const material = new THREE.MeshBasicMaterial({
-            //   color: Utils.getColorFromString(blockName),
-            // });
-            // const mesh = new THREE.Mesh(boxGeo, material);
-            // Main.scene.add(mesh);
         }
 
         let surfaces = block.surfaces.map((surface) => {
@@ -151,7 +110,8 @@ export default class BlockRenderer {
         });
 
         surfaces.forEach((surface) => {
-            group.add(surface);
+            surface.position.add(offset);
+            group!.add(surface);
         });
 
         window.scene.add(group);

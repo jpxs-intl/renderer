@@ -50,6 +50,14 @@ export default class HUD {
 
         this.ctx.fillStyle = "#FFFFFF";
 
+        // mode
+        Input.modeList.forEach((mode, index) => {
+            this.ctx.fillStyle = mode === Input.currentMode ? "#00FF00" : "#FFFFFF";
+            this.ctx.fillText(mode, window.innerWidth - 10 - this.ctx.measureText(mode).width, 30 + (index * 30));
+        })
+
+        this.ctx.fillStyle = "#FFFFFF";
+
         // status
         this.ctx.fillText(this.status, 10, this.canvas.height - 10);
 

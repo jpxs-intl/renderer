@@ -1,12 +1,15 @@
 import * as THREE from "three";
 import AssetManager from "./assetManager";
 import BlockRenderer from "./renderers/blockRenderer";
+import BuildingRenderer from "./renderers/buildingRenderer";
 
 export default class Input {
 
     public static currentText: string = "";
     public static currentSuggestions: string[] = [];
     public static currentSuggestionIndex: number = 0;
+    public static currentMode: "block" | "building" = "block";
+    public static modeList: ("block" | "building")[] = ["block", "building"];
 
     public static handleKeypress(e: KeyboardEvent) {
 
@@ -20,8 +23,21 @@ export default class Input {
             const result = Input.currentSuggestions[Input.currentSuggestionIndex];
             BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result);
             console.log(result);
-            
+
         } else if (e.key.includes("Arrow")) {
+
+            if (e.key === "ArrowLeft") {
+                Input.currentMode = Input.modeList[(Input.modeList.indexOf(Input.currentMode) - 1 + Input.modeList.length) % Input.modeList.length];
+                this.currentSuggestions = Input.getSuggestions(Input.currentText);
+                return
+            }
+
+            if (e.key === "ArrowRight") {
+                Input.currentMode = Input.modeList[(Input.modeList.indexOf(Input.currentMode) + 1) % Input.modeList.length];
+                this.currentSuggestions = Input.getSuggestions(Input.currentText);
+                return
+            }
+
             if (e.key === "ArrowUp") {
                 Input.currentSuggestionIndex--;
             }
@@ -34,18 +50,27 @@ export default class Input {
             if (Input.currentSuggestionIndex > Input.currentSuggestions.length - 1) Input.currentSuggestionIndex = 0;
 
             const result = Input.currentSuggestions[Input.currentSuggestionIndex];
-            BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result);
+            switch (Input.currentMode) {
+                case "block":
+                    BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result);
+                    break;
+                case "building":
+                    BuildingRenderer.renderBuilding(AssetManager.buildings.get(result)!, result);
+                    break;
+            }
 
         } else {
             Input.currentText += e.key;
         }
 
         this.currentSuggestions = Input.getSuggestions(Input.currentText);
-        
+
     }
 
     public static getSuggestions(text: string): string[] {
-        return Array.from(AssetManager.blocks.keys()).filter((key) => key.toLowerCase().includes(text.toLowerCase())).splice(0, 25);
+        return Array.from(AssetManager[
+            `${Input.currentMode}s`
+        ].keys()).filter((key) => key.toLowerCase().includes(text.toLowerCase())).splice(0, 25);
     }
 
 }
