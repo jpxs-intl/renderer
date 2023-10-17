@@ -47,7 +47,7 @@ export default class BuildingRenderer {
                         }
                     }
                 
-                    if (tile.block || tile.interiorBlock) {
+                    /*if (tile.block || tile.interiorBlock) {
                         const box = new THREE.BoxGeometry(1, 1, 1);
                         const boxMaterial = new THREE.MeshBasicMaterial({
                             color: 0xffffff,
@@ -58,7 +58,7 @@ export default class BuildingRenderer {
                         boxMesh.position.set(w, h, l)
                         console.log(boxMesh.position)
                         group.add(boxMesh)
-                    }
+                    }*/
 
                 }
             }

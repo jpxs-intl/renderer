@@ -67,8 +67,13 @@ export default class CSXFileParser {
         }
         case 0x02: {
           const fileData = buffer.slice(file.offset, file.offset + file.size);
-          const building = SBBFileParser.load(fileData, file.name);
-          AssetManager.buildings.set(file.name, building);
+          try {
+            const building = SBBFileParser.load(fileData, file.name);
+            AssetManager.buildings.set(file.name, building);
+          }
+          catch {
+            console.log("go to hell moron");
+          }
           break;
         }
         case 0x04: {
