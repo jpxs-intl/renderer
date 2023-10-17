@@ -31,6 +31,8 @@ const overheadLight = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
 overheadLight.position.set(0, 4, 0);
 scene.add(overheadLight);
 
+const helper = new THREE.AxesHelper(5);
+scene.add(helper);
 
 camera.position.z = 5;
 
@@ -39,7 +41,7 @@ const animate: FrameRequestCallback = (delta) => {
 
     renderer.render(scene, camera);
 
-   hud.updateDebugInfo(delta);
+    hud.updateDebugInfo(delta);
 };
 
 
