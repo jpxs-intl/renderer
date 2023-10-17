@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { BlockFile } from "../typings/blockFile";
 import BezierSurface from "./beizerSurface";
 import { hud } from "../hud";
+import AssetManager from "../assetManager";
 
 
 export default class BlockRenderer {
@@ -86,18 +87,18 @@ export default class BlockRenderer {
                 planeGeometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
                 return planeGeometry;
             });
-
-
+            box
 
             const boxGroup = new THREE.Group();
 
             planeGeometries.forEach((planeGeometry, index) => {
                 const planeMaterial = new THREE.MeshStandardMaterial({
-                    color: colors[index],
                     side: THREE.DoubleSide,
+                    map: textures ? AssetManager.textures.get(textures[index]) : undefined
                 });
                 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
                 planeMesh.name = `p: ${index} | b: ${blockName} | ${name}`;
+
                 boxGroup.add(planeMesh);
             })
 
