@@ -88,13 +88,15 @@ export default class SBBFileParser {
           const edgeZ = dataView.getUint32(offset + 16, true); // 20
           const floor = dataView.getUint32(offset + 20, true); // 24
 
-          if (Math.abs(block & 0xE0000000) == 0x80000000)
+          if (Math.abs(block & 0xE0000000) == 0x80000000) {
             rotationBlock = Math.abs((block & 0xF000000) >> 24)
             block = specialBlocks[block & 0x3FF]
+          }
 
-          if (Math.abs(interiorBlock & 0xE0000000) == 0x80000000)
+          if (Math.abs(interiorBlock & 0xE0000000) == 0x80000000) {
             rotationInteriorBlock = Math.abs((interiorBlock & 0xF000000) >> 24)
             interiorBlock = specialBlocks[interiorBlock & 0x3FF]
+          }
 
           // console.log(dataView.getUint32(offset + 8, true), interiorBlock.toString(16), block.toString(16))
           // @TODO: #FF0 | Handle edge case where block == 0x40000000 and interiorBlock == 0xffff. buildBlock is undefined in this case.
