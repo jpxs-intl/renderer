@@ -7,7 +7,7 @@ import AssetManager from "../assetManager";
 
 export default class BlockRenderer {
 
-    public static renderBlock(block: BlockFile, blockName: string, group?: THREE.Group, textures?: string[], offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0), name?: string) {
+    public static renderBlock(block: BlockFile, blockName: string, rotation: number, group?: THREE.Group, textures?: string[], offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0), name?: string) {
 
         if (!group) {
             const oldGroup = window.scene.getObjectByName("currentRender")
@@ -19,34 +19,9 @@ export default class BlockRenderer {
             group.name = "currentRender"
         }
 
-        const colors = [
-            0xff0000,
-            0x00ff00,
-            0x0000ff,
-            0xffff00,
-            0xff00ff,
-            0x00ffff,
+        const rotationTable = [
+           0, 270, 180 , 90 
         ]
-
-        // for (const surface of block.surfaces) {
-        //   for (let surfL = 0; surfL < 4; surfL++) {
-        //     for (let surfW = 0; surfW < 4; surfW++) {
-        //       const surfaceData = surface.data[surfL][surfW];
-        //       const vertexMarker = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        //       const vertexMarkerMaterial = new THREE.MeshBasicMaterial({
-        //         color: 0x00ff00,
-        //       });
-        //       const vertexMarkerMesh = new THREE.Mesh(vertexMarker, vertexMarkerMaterial);
-        //       vertexMarkerMesh.position.set(
-        //         adjustVec.x + surfaceData.vertex[0],
-        //         adjustVec.y + surfaceData.vertex[1],
-        //         adjustVec.z + surfaceData.vertex[2]
-        //       );
-        //       Main.scene.add(vertexMarkerMesh);
-        //     }
-        //   }
-        // }
-
 
         for (const box of block.boxes) {
 
@@ -79,16 +54,15 @@ export default class BlockRenderer {
                 const verts = new Float32Array(12);
                 let vertIndex = 0;
                 planeId.forEach((vertexId) => {
-                    verts[vertIndex] = box.vertices[vertexId][0] + offset.x;
-                    verts[vertIndex + 1] = box.vertices[vertexId][1] + offset.y;
-                    verts[vertIndex + 2] = box.vertices[vertexId][2] + offset.z;
+                    verts[vertIndex] = box.vertices[vertexId][0];
+                    verts[vertIndex + 1] = box.vertices[vertexId][1];
+                    verts[vertIndex + 2] = box.vertices[vertexId][2];
                     vertIndex += 3;
                 })
                 planeGeometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
                 return planeGeometry;
             });
-            box
-
+            
             const boxGroup = new THREE.Group();
 
             planeGeometries.forEach((planeGeometry, index) => {
@@ -102,8 +76,10 @@ export default class BlockRenderer {
                 boxGroup.add(planeMesh);
             })
 
-            group.add(boxGroup);
+            boxGroup.position.add(offset);
+            boxGroup.rotation.y = rotationTable[rotation] * (Math.PI / 180);
 
+            group.add(boxGroup);
 
         }
 
@@ -113,6 +89,7 @@ export default class BlockRenderer {
 
         surfaces.forEach((surface) => {
             surface.position.add(offset);
+            surface.rotation.y = rotationTable[rotation] * (Math.PI / 180);
             group!.add(surface);
         });
 

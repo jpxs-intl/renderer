@@ -25,17 +25,24 @@ export default class BuildingRenderer {
                     if (tile.block && typeof tile.block === "string") {
                         const blockFile = AssetManager.blocks.get(tile.block);
                         if (blockFile) {
-                            BlockRenderer.renderBlock(blockFile, tile.block, group, building.textures, new THREE.Vector3(w, h, l).add(offset), `${blockFile} | eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationBlock}`);
+                            BlockRenderer.renderBlock(blockFile, tile.block, tile.rotationBlock as number, group, building.textures, new THREE.Vector3(w, h, l).add(offset), `${blockFile} | eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationBlock}`);
                         }
                     }
 
                     if (tile.interiorBlock && typeof tile.interiorBlock === "string") {
                         const blockFile = AssetManager.blocks.get(tile.interiorBlock);
                         if (blockFile) {
-                            BlockRenderer.renderBlock(blockFile, tile.interiorBlock, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationInteriorBlock}`);
+                            BlockRenderer.renderBlock(blockFile, tile.interiorBlock, tile.rotationInteriorBlock as number, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationInteriorBlock}`);
                             console.log(`Tile ${w} ${l} ${h} | Block: ${tile.block} | Interior Block: ${tile.interiorBlock} | Edge: ${tile.edgeX} ${tile.edgeZ} `)
                         }
                     }
+
+                    // if (tile.block || tile.interiorBlock) {
+                    //     const debugCube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
+                    //     debugCube.position.set(w, h, l).add(offset).sub(new THREE.Vector3(0.5, 0.5, 0.5));
+                    //     group.add(debugCube);
+                    // }
+
                     tileIter++;
                 }
             }
