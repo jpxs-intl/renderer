@@ -15,27 +15,28 @@ export default class BuildingRenderer {
         const group = new THREE.Group()
         group.name = "currentRender"
 
+        let tileIter = 0;
         for (let h = 0; h < building.height; h++) {
-            for (let l = 0; l < building.length; l++) {
-                for (let w = 0; w < building.width; w++) {
+            for (let l = 0; l < building.length + 1; l++) {
+                for (let w = 0; w < building.width + 1; w++) {
                     const tile = building.tiles[h][l][w];
                     if (!tile) return;
 
                     if (tile.block && typeof tile.block === "string") {
                         const blockFile = AssetManager.blocks.get(tile.block);
                         if (blockFile) {
-                            BlockRenderer.renderBlock(blockFile, tile.block, group, building.textures, new THREE.Vector3(w, h, l).add(offset), `${blockFile} | eX: ${tile.edgeX} | eZ: ${tile.edgeZ}`);
+                            BlockRenderer.renderBlock(blockFile, tile.block, group, building.textures, new THREE.Vector3(w, h, l).add(offset), `${blockFile} | eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationBlock}`);
                         }
                     }
 
                     if (tile.interiorBlock && typeof tile.interiorBlock === "string") {
                         const blockFile = AssetManager.blocks.get(tile.interiorBlock);
                         if (blockFile) {
-                            BlockRenderer.renderBlock(blockFile, tile.interiorBlock, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` eX: ${tile.edgeX} | eZ: ${tile.edgeZ}`);
+                            BlockRenderer.renderBlock(blockFile, tile.interiorBlock, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationInteriorBlock}`);
                             console.log(`Tile ${w} ${l} ${h} | Block: ${tile.block} | Interior Block: ${tile.interiorBlock} | Edge: ${tile.edgeX} ${tile.edgeZ} `)
                         }
                     }
-
+                    tileIter++;
                 }
             }
         }

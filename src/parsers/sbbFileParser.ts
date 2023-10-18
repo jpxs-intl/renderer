@@ -63,6 +63,8 @@ export default class SBBFileParser {
       block?: string | number;
       interiorBlock?: string | number;
       buildBlock?: string;
+      rotationBlock?: number;
+      rotationInteriorBlock?: number;
       edgeX: number;
       edgeZ: number;
       floor: number;
@@ -80,14 +82,18 @@ export default class SBBFileParser {
           let block: string | number = dataView.getUint32(offset, true); // 4
           let interiorBlock: string | number = dataView.getUint32(offset + 4, true); // 8
           let buildBlock: string = buildBlocks[dataView.getUint32(offset + 8, true)]; // 12
+          let rotationBlock: number | undefined = undefined;
+          let rotationInteriorBlock: number | undefined = undefined;
           const edgeX = dataView.getUint32(offset + 12, true); // 16
           const edgeZ = dataView.getUint32(offset + 16, true); // 20
           const floor = dataView.getUint32(offset + 20, true); // 24
 
           if (Math.abs(block & 0xE0000000) == 0x80000000)
+            rotationBlock = Math.abs((block & 0xF000000) >> 24)
             block = specialBlocks[block & 0x3FF]
 
           if (Math.abs(interiorBlock & 0xE0000000) == 0x80000000)
+            rotationInteriorBlock = Math.abs((interiorBlock & 0xF000000) >> 24)
             interiorBlock = specialBlocks[interiorBlock & 0x3FF]
 
           // console.log(dataView.getUint32(offset + 8, true), interiorBlock.toString(16), block.toString(16))
@@ -118,6 +124,8 @@ export default class SBBFileParser {
             block,
             interiorBlock,
             buildBlock,
+            rotationBlock,
+            rotationInteriorBlock,
             edgeX,
             edgeZ,
             floor,

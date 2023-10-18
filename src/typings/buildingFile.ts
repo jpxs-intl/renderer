@@ -18,6 +18,8 @@ export interface Tile {
   block?: string | number;
   interiorBlock?: string | number;
   buildBlock?: string;
+  rotationBlock?: number;
+  rotationInteriorBlock?: number;
   edgeX: number;
   edgeZ: number;
   floor: number;
