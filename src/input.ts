@@ -21,7 +21,7 @@ export default class Input {
             Input.currentText += " ";
         } else if (e.key == "Enter") {
             const result = Input.currentSuggestions[Input.currentSuggestionIndex];
-            BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result);
+            BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result, Math.floor(Math.random() * 3), undefined, undefined, undefined, undefined, new THREE.Vector3(5, 5, 5));
             console.log(result);
 
         } else if (e.key.includes("Arrow")) {
@@ -52,7 +52,7 @@ export default class Input {
             const result = Input.currentSuggestions[Input.currentSuggestionIndex];
             switch (Input.currentMode) {
                 case "block":
-                    BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result);
+                    BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result, 0);
                     break;
                 case "building":
                     BuildingRenderer.renderBuilding(AssetManager.buildings.get(result)!, result);

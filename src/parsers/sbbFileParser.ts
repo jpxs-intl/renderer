@@ -77,8 +77,8 @@ export default class SBBFileParser {
     }[][][] = [];
 
     for (let h = 0; h < height; h++) {
-      for (let l = 0; l < (length + 1); l++) {
-        for (let w = 0; w < (width + 1); w++) {
+      for (let l = 1; l <= length + 1; l++) {
+        for (let w = 1; w <= width + 1; w++) {
           let block: string | number = dataView.getUint32(offset, true); // 4
           let interiorBlock: string | number = dataView.getUint32(offset + 4, true); // 8
           let buildBlock: string = buildBlocks[dataView.getUint32(offset + 8, true)]; // 12
