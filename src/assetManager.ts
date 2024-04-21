@@ -39,17 +39,41 @@ export default class AssetManager {
             "round.csx",
         ]
 
-        for (const file of files) {
-            if (localStorage.getItem(file)) continue;
+        const csxCache = await caches.open("csx")
 
-           hud.status = `Downloading ${file}...`;
-            await fetch(`https://assets.jpxs.io/csx/${file}`)
-                .then((response) => response.arrayBuffer())
-                .then((buffer) => {
-                    // HUD.status = `Parsing ${file}...`;
-                   CSXFileParser.load(buffer, file)
-                });
-        }
+        await Promise.all(files.map(async (file) => {
+
+            const url = new URL(`https://assets.jpxs.io/csx/${file}`)
+            const request = await csxCache.match(url)
+            if (request) {
+                hud.status = `Loading ${file} (cached) ...`;
+                return new Promise<void>((resolve, reject) => {
+                    request.arrayBuffer().then(async (buffer) => {
+                        hud.status = `Parsing ${file}...`;
+                        await CSXFileParser.load(buffer, file)
+                        resolve();
+                    });
+                })
+            } else {
+                return new Promise<void>(async (resolve, reject) => {
+                    hud.status = `Downloading ${file}...`;
+
+                    await fetch(url)
+                        .then((response) => response.arrayBuffer())
+                        .then(async (buffer) => {
+
+                            csxCache.put(url, new Response(buffer))
+
+                            hud.status = `Parsing ${file}...`;
+                            await CSXFileParser.load(buffer, file)
+                            resolve();
+                        });
+                })
+            }
+
+        }))
+
+        hud.deleteAllWorkers();
 
         hud.status = `Done, loaded ${this.textures.size} textures, ${this.buildings.size} buildings, and ${this.blocks.size} Blocks.`
     }

@@ -2,6 +2,7 @@ import * as THREE from "three";
 import AssetManager from "./assetManager";
 import BlockRenderer from "./renderers/blockRenderer";
 import BuildingRenderer from "./renderers/buildingRenderer";
+import SBBFileParser from "./parsers/sbbFileParser";
 
 export default class Input {
 
@@ -12,6 +13,29 @@ export default class Input {
     public static modeList: ("block" | "building")[] = ["block", "building"];
 
     public static handleKeypress(e: KeyboardEvent) {
+
+        if (e.ctrlKey) {
+            if (e.key === "b") {
+                // open file browser
+
+                e.preventDefault();
+
+                const fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.accept = ".sbb";
+                fileInput.click();
+
+                fileInput.onchange = async (e) => {
+                    const file = (e.target as HTMLInputElement).files![0];
+                    const buffer = await file.arrayBuffer();
+                    const fileName = file.name.split(".")[0];
+                    const building = SBBFileParser.load(buffer, fileName);
+                    BuildingRenderer.renderBuilding(building, fileName);
+
+                    console.log(building);
+                }
+            }
+        }
 
         if (e.key.length > 1 && e.key != "Space" && e.key != "Backspace" && e.key != "Enter" && !e.key.includes("Arrow")) return;
 

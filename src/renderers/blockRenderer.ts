@@ -20,7 +20,7 @@ export default class BlockRenderer {
         }
 
         const rotationTable = [
-           0, 270, 180 , 90 
+            0, 270, 180, 90
         ]
 
         const blockGroup = new THREE.Group();
@@ -64,17 +64,20 @@ export default class BlockRenderer {
                 planeGeometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
                 return planeGeometry;
             });
-            
+
             const boxGroup = new THREE.Group();
 
             planeGeometries.forEach((planeGeometry, index) => {
-                const planeMaterial = new THREE.MeshStandardMaterial({
+                const planeMaterial = textures ? new THREE.MeshStandardMaterial({
                     side: THREE.DoubleSide,
                     map: textures ? AssetManager.textures.get(textures[index]) : undefined
+                }) : new THREE.MeshStandardMaterial({
+                    side: THREE.DoubleSide,
+                    color: 0xffffff
                 });
-                const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-                planeMesh.name = `p: ${index} | b: ${blockName} | ${name}`;
 
+                const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+                planeMesh.name = `p: ${index} | b: ${blockName}${name ? ` | ${name}` : ""}`;
                 boxGroup.add(planeMesh);
             })
 
@@ -92,33 +95,34 @@ export default class BlockRenderer {
             blockGroup!.add(surface);
         });
 
+        console.log(block)
+
         let newVec = new THREE.Vector3();
         const bBox = new THREE.Box3();
         bBox.setFromObject(blockGroup);
 
         let newX = bBox.max.x
         let newZ = bBox.min.z
-        if(edgeX) {
+        if (edgeX) {
             //newX = bBox.max.x + edgeX;
             //newZ = bBox.min.z - (edgeX / 2);
         }
 
-        if(edgeZ) {
+        if (edgeZ) {
             //newZ = bBox.min.z - edgeZ;
             //newX = bBox.max.x + (edgeZ / 2);
         }
-        
+
         newVec.set(newX, bBox.max.y, newZ)
 
         newVec.multiplyScalar(-1);
-        console.log(newVec);
         blockGroup.traverse(function (child) {
             if (child instanceof THREE.Mesh) {
                 child.geometry.translate(newVec.x, newVec.y, newVec.z);
             }
         });
         blockGroup.position.add(offset);
-        blockGroup.position.add(new THREE.Vector3(edgeX! * 2, 0, edgeX!));
+        blockGroup.position.add(new THREE.Vector3(edgeX! * 2, 0, edgeZ!));
 
         blockGroup.position.sub(newVec);
         blockGroup.rotation.y = rotationTable[rotation] * (Math.PI / 180);

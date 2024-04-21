@@ -25,7 +25,7 @@ export default class BuildingRenderer {
                     if (tile.block && typeof tile.block === "string") {
                         const blockFile = AssetManager.blocks.get(tile.block);
                         if (blockFile) {
-                            BlockRenderer.renderBlock(blockFile, tile.block, tile.rotationBlock as number, tile.edgeX, tile.edgeZ, group, building.textures, new THREE.Vector3(w, h, l).add(offset), `${blockFile} | eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationBlock} | ${tileIter} ${l}x${w}x${h}`);
+                            BlockRenderer.renderBlock(blockFile, tile.block, tile.rotationBlock as number, tile.edgeX, tile.edgeZ, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationBlock} | ${tileIter} ${l}x${w}x${h}`);
                         }
                     }
 

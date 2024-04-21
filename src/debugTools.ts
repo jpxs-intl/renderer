@@ -10,7 +10,7 @@ export default class DebugTools {
 
         window.addEventListener("mousemove", (e) => {
             const intersections = DebugTools.castMousePosition(e);
-            if (intersections[0]) {
+            if (intersections[0] && intersections[0].object.name !== "") {
                 hud.status = intersections[0].object.name;
             }
         });

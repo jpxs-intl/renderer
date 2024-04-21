@@ -6,20 +6,19 @@ import DebugTools from "./debugTools";
 
 window.scene = new THREE.Scene();
 window.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+window.renderer = new THREE.WebGLRenderer({ antialias: true });
 
-export const renderer = new THREE.WebGLRenderer({ antialias: true });
-
-export const controls = new MapControls(camera, renderer.domElement);
+export const controls = new MapControls(camera, window.renderer.domElement);
 export let currentBlock: string = "";
 
 
 // enable debug info
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+window.renderer.setSize(window.innerWidth, window.innerHeight);
 camera.aspect = window.innerWidth / window.innerHeight;
 camera.updateProjectionMatrix();
-renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
+window.renderer.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(window.renderer.domElement);
 
 const pointLight = new THREE.DirectionalLight(0xffffff, 2);
 pointLight.position.set(0, 3, 3)
@@ -39,7 +38,7 @@ camera.position.z = 5;
 const animate: FrameRequestCallback = (delta) => {
     requestAnimationFrame(animate);
 
-    renderer.render(scene, camera);
+    window.renderer.render(scene, camera);
 
     hud.updateDebugInfo(delta);
 };
@@ -53,7 +52,7 @@ AssetManager.downloadCSXFiles()
 animate(0);
 
 window.addEventListener("resize", () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    window.renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 });
