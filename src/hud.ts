@@ -107,16 +107,25 @@ export default class HUD {
         for (const workerId in this.workers) {
             const worker = this.workers[workerId];
 
+            const timeSinceUpdate = Date.now() - (worker.lastUpdate || 0);
+
             this.ctx.fillStyle = worker.busy ? "#FF0000" : "#00FF00";
+
             this.ctx.fillText(`Worker ${workerId}: ${worker.status}`, window.innerWidth - 10 - this.ctx.measureText(`Worker ${workerId}: ${worker.status}`).width, window.innerHeight - 15 - (workerIndex * 15));
 
-            if (worker.lastUpdate && Date.now() - worker.lastUpdate > 5000) {
+            this.ctx.globalAlpha = 1;
+
+            if (worker.lastUpdate && timeSinceUpdate > 2000) {
                 delete this.workers[workerId];
             }
 
             workerIndex++;
         }
 
+        if (workerIndex !== 0) {
+            this.ctx.fillStyle = "#FFFFFF";
+            this.ctx.fillText(`Workers: ${workerIndex}`, window.innerWidth - 10 - this.ctx.measureText(`Workers: ${workerIndex}`).width, window.innerHeight - 15 - (workerIndex * 15));
+        }
 
         this.lastFrame = renderTime;
     }
@@ -125,12 +134,14 @@ export default class HUD {
         this.workers[workerId] = {
             status,
             busy: true,
+            lastUpdate: Date.now(),
         }
     }
 
     public clearWorkerStatus(workerId: string) {
         if (this.workers[workerId]) {
             this.workers[workerId].busy = false;
+            this.workers[workerId].lastUpdate = Date.now();
         }
     }
 
