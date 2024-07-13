@@ -92,9 +92,10 @@ export default class Input {
     }
 
     public static getSuggestions(text: string): string[] {
-        return Array.from(AssetManager[
-            `${Input.currentMode}s`
-        ].keys()).filter((key) => key.toLowerCase().includes(text.toLowerCase())).splice(0, 25);
+        const keys = Array.from(AssetManager[`${Input.currentMode}s`].keys())
+        return keys.filter((key) =>
+            key &&
+            key.toLowerCase().includes(text.toLowerCase())).splice(0, 25);
     }
 
 }

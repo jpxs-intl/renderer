@@ -17,6 +17,8 @@ export default class BlockRenderer {
 
             group = new THREE.Group()
             group.name = "currentRender"
+
+            window.scene.add(group)
         }
 
         const rotationTable = [
@@ -50,6 +52,15 @@ export default class BlockRenderer {
                 ]
             ]
 
+            const planeColors = [
+                0xff0000,
+                0x00ff00,
+                0x0000ff,
+                0xffff00,
+                0xff00ff,
+                0x00ffff
+            ]
+
             const planeGeometries = planeIds.map((planeId) => {
                 const planeGeometry = new THREE.PlaneGeometry(1, 1);
 
@@ -70,10 +81,10 @@ export default class BlockRenderer {
             planeGeometries.forEach((planeGeometry, index) => {
                 const planeMaterial = textures ? new THREE.MeshStandardMaterial({
                     side: THREE.DoubleSide,
-                    map: textures ? AssetManager.textures.get(textures[index]) : undefined
+                    map: AssetManager.textures.get(textures[index])
                 }) : new THREE.MeshStandardMaterial({
                     side: THREE.DoubleSide,
-                    color: 0xffffff
+                    color: planeColors[index],
                 });
 
                 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
