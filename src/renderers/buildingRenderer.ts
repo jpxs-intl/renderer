@@ -32,7 +32,7 @@ export default class BuildingRenderer {
                     if (tile.interiorBlock && typeof tile.interiorBlock === "string") {
                         const blockFile = AssetManager.blocks.get(tile.interiorBlock);
                         if (blockFile) {
-                            BlockRenderer.renderBlock(blockFile, tile.interiorBlock, tile.rotationInteriorBlock as number, tile.edgeX, tile.edgeZ, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` eX: ${tile.edgeX} | eZ: ${tile.edgeZ} | number: ${tileIter} | rotation: ${tile.rotationInteriorBlock} | ${tileIter} ${l}x${w}x${h}`);
+                            BlockRenderer.renderBlock(blockFile, tile.interiorBlock, tile.rotationInteriorBlock as number, tile.edgeX, tile.edgeZ, group, building.textures, new THREE.Vector3(w, h, l).add(offset), ` number: ${tileIter} | rotation: ${tile.rotationInteriorBlock} | ${tileIter} ${l}x${w}x${h}`);
                             console.log(`Tile ${w} ${l} ${h} | Block: ${tile.block} | Interior Block: ${tile.interiorBlock} | Edge: ${tile.edgeX} ${tile.edgeZ} `)
                         }
                     }
@@ -42,6 +42,16 @@ export default class BuildingRenderer {
                     //     debugCube.position.set(w, h, l).add(offset).sub(new THREE.Vector3(0.5, 0.5, 0.5));
                     //     group.add(debugCube);
                     // }
+
+                    // if (tile.floor) {
+                    //     const floor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
+                    //     // rotate the floor
+                    //     floor.rotation.x = -Math.PI / 2;
+                    //     floor.position.set(w, h, l).add(offset)
+                    //     group.add(floor);
+                    // }
+
+
 
                     tileIter++;
                 }

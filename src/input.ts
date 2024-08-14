@@ -11,6 +11,7 @@ export default class Input {
     public static currentSuggestionIndex: number = 0;
     public static currentMode: "block" | "building" = "block";
     public static modeList: ("block" | "building")[] = ["block", "building"];
+    public static rotation: number = 0;
 
     public static handleKeypress(e: KeyboardEvent) {
 
@@ -45,21 +46,42 @@ export default class Input {
             Input.currentText += " ";
         } else if (e.key == "Enter") {
             const result = Input.currentSuggestions[Input.currentSuggestionIndex];
-            BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result, Math.floor(Math.random() * 3), undefined, undefined, undefined, undefined, new THREE.Vector3(5, 5, 5));
+            BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result, this.rotation);
             console.log(result);
 
         } else if (e.key.includes("Arrow")) {
 
             if (e.key === "ArrowLeft") {
-                Input.currentMode = Input.modeList[(Input.modeList.indexOf(Input.currentMode) - 1 + Input.modeList.length) % Input.modeList.length];
-                this.currentSuggestions = Input.getSuggestions(Input.currentText);
-                return
+                if (e.shiftKey) {
+                    this.rotation = (this.rotation + 1) % 4;
+
+                    const result = Input.currentSuggestions[Input.currentSuggestionIndex];
+                    BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result, this.rotation);
+
+                    console.log(this.rotation);
+                    return
+                } else {
+                    Input.currentMode = Input.modeList[(Input.modeList.indexOf(Input.currentMode) - 1 + Input.modeList.length) % Input.modeList.length];
+                    this.currentSuggestions = Input.getSuggestions(Input.currentText);
+                    return
+                }
+
             }
 
             if (e.key === "ArrowRight") {
-                Input.currentMode = Input.modeList[(Input.modeList.indexOf(Input.currentMode) + 1) % Input.modeList.length];
-                this.currentSuggestions = Input.getSuggestions(Input.currentText);
-                return
+                if (e.shiftKey) {
+                    this.rotation = (Math.abs(this.rotation) - 1) % 4
+
+                    const result = Input.currentSuggestions[Input.currentSuggestionIndex];
+                    BlockRenderer.renderBlock(AssetManager.blocks.get(result)!, result, this.rotation);
+
+                    console.log(this.rotation);
+                    return
+                } else {
+                    Input.currentMode = Input.modeList[(Input.modeList.indexOf(Input.currentMode) + 1) % Input.modeList.length];
+                    this.currentSuggestions = Input.getSuggestions(Input.currentText);
+                    return
+                }
             }
 
             if (e.key === "ArrowUp") {
