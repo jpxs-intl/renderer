@@ -8,7 +8,7 @@ export default defineConfig({
         outDir: "../dist",
         assetsDir: "static",
         emptyOutDir: true,
-        sourcemap: true,
+        // sourcemap: true,
     },
 });
 

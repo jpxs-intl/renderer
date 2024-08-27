@@ -1,3 +1,4 @@
+import AssetManager from "../assetManager";
 import { CityFile } from "../typings/cityFile";
 import ParserUtils from "./parserUtils";
 
@@ -124,42 +125,42 @@ export default class SBCFileParser {
     }[] = [];
 
     for (let i = 0; i < sectorQuanity; i++) {
-        const areaNumber = dataView.getUint32(offset, true);
-        const sectorX = dataView.getUint32(offset + 4, true);
-        const sectorY = dataView.getUint32(offset + 8, true);
-        const sectorZ = dataView.getUint32(offset + 12, true);
-        offset += 16;
+      const areaNumber = dataView.getUint32(offset, true);
+      const sectorX = dataView.getUint32(offset + 4, true);
+      const sectorY = dataView.getUint32(offset + 8, true);
+      const sectorZ = dataView.getUint32(offset + 12, true);
+      offset += 16;
 
-        const blocks: number[] = [];
+      const blocks: number[] = [];
 
-        for (let i = 0; i < 512; i++) {
-            blocks.push(dataView.getUint32(offset, true));
-            offset += 4;
-        }
+      for (let i = 0; i < 512; i++) {
+        blocks.push(dataView.getUint32(offset, true));
+        offset += 4;
+      }
 
-        const textures: number[] = [];
-        
-        for (let i = 0; i < 4096; i++) {
-            textures.push(dataView.getUint16(offset, true));
-            offset += 2;
-        }
-        
-        const itemsets: number[] = [];
+      const textures: number[] = [];
 
-        for (let i = 0; i < 512; i++) {
-            itemsets.push(dataView.getUint16(offset, true));
-            offset += 4;
-        }
+      for (let i = 0; i < 4096; i++) {
+        textures.push(dataView.getUint16(offset, true));
+        offset += 2;
+      }
 
-        sectors.push({
-            areaNumber,
-            sectorX,
-            sectorY,
-            sectorZ,
-            blocks,
-            textures,
-            itemsets
-        })
+      const itemsets: number[] = [];
+
+      for (let i = 0; i < 512; i++) {
+        itemsets.push(dataView.getUint16(offset, true));
+        offset += 4;
+      }
+
+      sectors.push({
+        areaNumber,
+        sectorX,
+        sectorY,
+        sectorZ,
+        blocks,
+        textures,
+        itemsets
+      })
 
     }
 
@@ -176,16 +177,16 @@ export default class SBCFileParser {
 
 
     for (let i = 0; i < waypointCount; i++) {
-        const x = dataView.getUint32(offset, true);
-        const y = dataView.getUint32(offset + 4, true);
-        const z = dataView.getUint32(offset + 8, true);
-        offset += 12;
+      const x = dataView.getUint32(offset, true);
+      const y = dataView.getUint32(offset + 4, true);
+      const z = dataView.getUint32(offset + 8, true);
+      offset += 12;
 
-        waypoints.push({
-            x,
-            y,
-            z
-        })
+      waypoints.push({
+        x,
+        y,
+        z
+      })
     }
 
     const cityData: CityFile = {
@@ -207,7 +208,6 @@ export default class SBCFileParser {
     console.log("Loaded", fileName);
     console.log(JSON.stringify(cityData, null))
 
-
-
+    AssetManager.maps.set(fileName, cityData);
   }
 }

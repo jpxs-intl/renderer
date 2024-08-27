@@ -6,19 +6,19 @@ export default class SBLFileParser {
 
     const version = dataView.getUint32(0, true);
 
-   if (version !== 1) throw new Error(`SBL version ${version} is not supported.`);
+    if (version !== 1) throw new Error(`SBL version ${version} is not supported.`);
 
-    const size0 = dataView.getUint32(4, true);
-    const size1 = dataView.getUint32(8, true);
-    const size2 = dataView.getUint32(12, true);
+    const sizeX = dataView.getUint32(4, true);
+    const sizeY = dataView.getUint32(8, true);
+    const sizeZ = dataView.getUint32(12, true);
 
     const floor = dataView.getUint32(16, true);
     const ceiling = dataView.getUint32(20, true);
 
-    const wall1 = dataView.getUint32(24, true);
-    const wall2 = dataView.getUint32(28, true);
-    const wall3 = dataView.getUint32(32, true);
-    const wall4 = dataView.getUint32(36, true);
+    const wallPZ = dataView.getUint32(24, true);
+    const wallNX = dataView.getUint32(28, true);
+    const wallPX = dataView.getUint32(32, true);
+    const wallNZ = dataView.getUint32(36, true);
 
     const surfaceQuanity = dataView.getUint32(40, true);
 
@@ -72,7 +72,7 @@ export default class SBLFileParser {
         }
       }
 
-     // console.log(data, fileName)
+      // console.log(data, fileName)
 
       const surface = {
         orderX,
@@ -129,15 +129,15 @@ export default class SBLFileParser {
 
     const block = {
       version,
-      size0,
-      size1,
-      size2,
+      sizeX,
+      sizeY,
+      sizeZ,
       floor,
       ceiling,
-      wall1,
-      wall2,
-      wall3,
-      wall4,
+      wallPZ,
+      wallNX,
+      wallPX,
+      wallNZ,
       surfaces,
       boxes,
     };
@@ -156,7 +156,7 @@ export default class SBLFileParser {
 
     let offset = 4;
     for (let i = 0; i < 16; i++) {
-  
+
       const type = dataView.getUint32(offset, true);
       const x = dataView.getUint32(offset + 4, true);
       const width = dataView.getUint32(offset + 8, true);
@@ -164,10 +164,10 @@ export default class SBLFileParser {
       const height = dataView.getUint32(offset + 16, true);
 
       const doorCount = dataView.getUint32(offset + 20, true);
-      
+
       offset += 24;
 
-      let doors:Door[] = [];
+      let doors: Door[] = [];
 
       for (let j = 0; j < doorCount; j++) {
         const doorType = dataView.getUint32(offset, true);
@@ -239,7 +239,7 @@ export default class SBLFileParser {
         windows,
         beams,
       };
-  
+
       portals.push(portal);
     }
 

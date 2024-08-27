@@ -1,11 +1,27 @@
 import * as THREE from "three";
 import { BlockFile } from "../typings/blockFile";
 import BezierSurface from "./beizerSurface";
-import { hud } from "../hud";
 import AssetManager from "../assetManager";
+import { hud } from "../hud";
 
 
 export default class BlockRenderer {
+
+    public static init() {
+        const planeColors = [
+            0xff0000,
+            0x00ff00,
+            0x0000ff,
+            0xffff00,
+            0xff00ff,
+            0x00ffff
+        ]
+
+        planeColors.forEach((color, index) => {
+            AssetManager.materials.set(`planeColor_${index}`, new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide }));
+        })
+
+    }
 
     public static renderBlock(block: BlockFile, blockName: string, rotation: number, edgeX?: number, edgeZ?: number, group?: THREE.Group, textures?: string[], offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0), name?: string) {
 
@@ -48,19 +64,11 @@ export default class BlockRenderer {
             ]
         ]
 
-        const planeColors = [
-            0xff0000,
-            0x00ff00,
-            0x0000ff,
-            0xffff00,
-            0xff00ff,
-            0x00ffff
-        ]
+
 
         const blockGroup = new THREE.Group();
 
         for (const box of block.boxes) {
-
 
             const planeGeometries = planeIds.map((planeId) => {
                 const planeGeometry = new THREE.PlaneGeometry(1, 1);
@@ -80,16 +88,28 @@ export default class BlockRenderer {
             const boxGroup = new THREE.Group();
 
             planeGeometries.forEach((planeGeometry, index) => {
-                const planeMaterial = textures ? new THREE.MeshStandardMaterial({
-                    side: THREE.DoubleSide,
-                    map: AssetManager.textures.get(textures[index])
-                }) : new THREE.MeshStandardMaterial({
-                    side: THREE.DoubleSide,
-                    color: planeColors[index],
-                });
+
+                let planeMaterial: THREE.MeshStandardMaterial;
+
+                if (textures) {
+
+                    if (AssetManager.materials.has(`planeTexture_${textures[index]}`)) {
+                        planeMaterial = AssetManager.materials.get(`planeTexture_${textures[index]}`)! as THREE.MeshStandardMaterial;
+                    } else {
+                        planeMaterial = new THREE.MeshStandardMaterial({
+                            side: THREE.DoubleSide,
+                            map: AssetManager.textures.get(textures[index])
+                        })
+
+                        AssetManager.materials.set(`planeTexture_${textures[index]}`, planeMaterial);
+                        hud.status = `Created material for texture ${textures[index]}`;
+                    }
+                } else {
+                    planeMaterial = AssetManager.materials.get(`planeColor_${index}`)! as THREE.MeshStandardMaterial;
+                }
 
                 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-                planeMesh.name = `s: ${block.size0}, ${block.size1}, ${block.size2} | p: ${index} | b: ${blockName}${name ? ` | ${name}` : ""}`;
+                planeMesh.name = `s: ${block.sizeX}, ${block.sizeY}, ${block.sizeZ} | p: ${index} | b: ${blockName}${name ? ` | ${name}` : ""}`;
                 boxGroup.add(planeMesh);
             })
 
@@ -107,86 +127,104 @@ export default class BlockRenderer {
             blockGroup!.add(surface);
         });
 
+        console.log(block);
+
+        // modifiers 
+
+        const wallgroup = new THREE.Group();
 
         // floor
-        if (block.floor) {
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(block.size0, block.size2), new THREE.MeshStandardMaterial({ color: planeColors[0] }));
+        if (block.floor != 0) {
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), AssetManager.materials.get(`planeColor_0`));
             floor.rotation.x = -Math.PI / 2;
-            floor.position.set(block.size0 / 2, 0, block.size2 / 2)
-            blockGroup.add(floor);
-            floor.name = `floor: ${blockName}${name ? ` | ${name}` : ""}`;
+            floor.position.set(block.sizeX / 2, globalOffset, block.sizeZ / 2)
+            wallgroup.add(floor);
+            floor.name = `floor: ${blockName} | f: ${block.floor}${name ? ` | ${name}` : ""}`;
         }
 
         // ceiling
-        if (block.ceiling) {
-            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(block.size0, block.size2), new THREE.MeshStandardMaterial({ color: planeColors[1] }));
+        if (block.ceiling == 1) {
+            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), AssetManager.materials.get(`planeColor_1`));
             ceiling.rotation.x = Math.PI / 2;
-            ceiling.position.set(block.size0 / 2, block.size1, block.size2 / 2)
-            blockGroup.add(ceiling);
-            ceiling.name = `ceiling: ${blockName}${name ? ` | ${name}` : ""}`;
+            ceiling.position.set(block.sizeX / 2, block.sizeY - globalOffset, block.sizeZ / 2)
+            wallgroup.add(ceiling);
+            ceiling.name = `ceiling: ${blockName} | c: ${block.ceiling}${name ? ` | ${name}` : ""}`;
         }
 
-        // wall1 (positive x)
-        if (block.wall1) {
-            const wall1 = new THREE.Mesh(new THREE.PlaneGeometry(block.size1, block.size2), new THREE.MeshStandardMaterial({ color: planeColors[2] }));
-            wall1.rotation.y = Math.PI / 2;
-            wall1.position.set(block.size0, block.size1 / 2, block.size2 / 2)
-            blockGroup.add(wall1);
-            wall1.name = `wall1: ${blockName}${name ? ` | ${name}` : ""}`;
+        // neg x | "wallx_far"
+        if (block.wallNX != 0) {
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeZ - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_5`));
+            wall.rotation.y = Math.PI / 2;
+            wall.position.set(globalOffset, block.sizeY / 2, block.sizeZ / 2)
+            wallgroup.add(wall);
+            wall.name = `wallnx: ${blockName} | v: ${block.wallNX}${name ? ` | ${name}` : ""}`;
         }
 
-        // wall2 (positive z)
-        if (block.wall2) {
-            const wall2 = new THREE.Mesh(new THREE.PlaneGeometry(block.size0, block.size1), new THREE.MeshStandardMaterial({ color: planeColors[3] }));
-            wall2.position.set(block.size0 / 2, block.size1 / 2, 0)
-            blockGroup.add(wall2);
-            wall2.name = `wall2: ${blockName}${name ? ` | ${name}` : ""}`;
+        // pos x | "wallx"
+        if (block.wallPX != 0) {
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeZ - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_4`))
+            wall.rotation.y = -Math.PI / 2;
+            wall.position.set(block.sizeX - globalOffset, block.sizeY / 2, block.sizeZ / 2)
+            wallgroup.add(wall);
+            wall.name = `wallpx: ${blockName} | v: ${block.wallPX}${name ? ` | ${name}` : ""}`;
         }
 
-        // wall3 (negative x)
-        if (block.wall3) {
-            const wall3 = new THREE.Mesh(new THREE.PlaneGeometry(block.size1, block.size2), new THREE.MeshStandardMaterial({ color: planeColors[4] }));
-            wall3.rotation.y = -Math.PI / 2;
-            wall3.position.set(0, block.size1 / 2, block.size2 / 2)
-            blockGroup.add(wall3);
-            wall3.name = `wall3: ${blockName}${name ? ` | ${name}` : ""}`;
+        // neg z | "wallz_far"
+        if (block.wallNZ != 0) {
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_2`))
+            wall.position.set(block.sizeX / 2, block.sizeY / 2, globalOffset)
+            wallgroup.add(wall);
+            wall.name = `wallnz: ${blockName} | v: ${block.wallNZ}${name ? ` | ${name}` : ""}`;
         }
 
-        // wall4 (negative z)
-        if (block.wall4) {
-            const wall4 = new THREE.Mesh(new THREE.PlaneGeometry(block.size0, block.size1), new THREE.MeshStandardMaterial({ color: planeColors[5] }));
-            wall4.rotation.y = Math.PI;
-            wall4.position.set(block.size0 / 2, block.size1 / 2, block.size2)
-            blockGroup.add(wall4);
-            wall4.name = `wall4: ${blockName}${name ? ` | ${name}` : ""}`;
+        // pos z | "wallz"
+        if (block.wallPZ != 0) {
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_3`))
+            wall.rotation.y = Math.PI;
+            wall.position.set(block.sizeX / 2, block.sizeY / 2, block.sizeZ - globalOffset)
+            wallgroup.add(wall);
+            wall.name = `wallpz: ${blockName} | v: ${block.wallPZ}${name ? ` | ${name}` : ""}`;
         }
-
-
-        console.log(block)
 
         let newVec = new THREE.Vector3();
-        const bBox = new THREE.Box3();
-        bBox.setFromObject(blockGroup);
 
         switch (rotationTable[rotation]) {
             case 0:
-                newVec.set(0, bBox.min.y, 0)
+                newVec.set(0, 0, 0)
                 break;
             case 90:
-                newVec.set(block.size0, bBox.min.y, 0)
+                newVec.set(block.sizeX, 0, 0)
                 break;
             case 180:
-                newVec.set(block.size0, bBox.min.y, block.size2)
+                newVec.set(block.sizeX, 0, block.sizeZ)
                 break;
             case 270:
-                newVec.set(0, bBox.min.y, block.size2)
+                newVec.set(0, 0, block.sizeZ)
                 break;
         }
 
-
+        let wallNewVec = new THREE.Vector3();
+        switch (rotationTable[rotation]) {
+            case 0:
+                wallNewVec.set(0, 0, 0)
+                break;
+            case 90:
+                wallNewVec.set(0, 0, block.sizeX)
+                break;
+            case 180:
+                wallNewVec.set(block.sizeX, 0, block.sizeZ)
+                break;
+            case 270:
+                wallNewVec.set(block.sizeZ, 0, 0)
+                break;
+        }
 
         blockGroup.position.add(offset);
         blockGroup.rotation.y = rotationTable[rotation] * (Math.PI / 180);
+
+        wallgroup.position.add(wallNewVec)
+        wallgroup.position.add(offset);
+        wallgroup.rotation.y = rotationTable[rotation] * (Math.PI / 180);
 
         newVec.multiplyScalar(-1);
         blockGroup.traverse(function (child) {
@@ -195,6 +233,7 @@ export default class BlockRenderer {
             }
         });
 
+        group.add(wallgroup);
         group.add(blockGroup);
         window.scene.add(group);
 

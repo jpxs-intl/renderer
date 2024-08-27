@@ -1,14 +1,14 @@
 export interface BlockFile {
   version: number;
-  size0: number;
-  size1: number;
-  size2: number;
+  sizeX: number;
+  sizeY: number;
+  sizeZ: number;
   floor: number;
   ceiling: number;
-  wall1: number;
-  wall2: number;
-  wall3: number;
-  wall4: number;
+  wallNX: number;
+  wallPZ: number;
+  wallPX: number;
+  wallNZ: number;
   surfaces: Surface[];
   boxes: Box[];
 }

@@ -1,16 +1,18 @@
 import * as THREE from "three";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import AssetManager from "./assetManager";
 import BlockRenderer from "./renderers/blockRenderer";
 import BuildingRenderer from "./renderers/buildingRenderer";
 import SBBFileParser from "./parsers/sbbFileParser";
+import CityRenderer from "./renderers/cityRenderer";
 
 export default class Input {
 
     public static currentText: string = "";
     public static currentSuggestions: string[] = [];
     public static currentSuggestionIndex: number = 0;
-    public static currentMode: "block" | "building" = "block";
-    public static modeList: ("block" | "building")[] = ["block", "building"];
+    public static currentMode: "block" | "building" | "map" = "block";
+    public static modeList: ("block" | "building" | "map")[] = ["block", "building", "map"];
     public static rotation: number = 0;
 
     public static handleKeypress(e: KeyboardEvent) {
@@ -35,6 +37,25 @@ export default class Input {
 
                     console.log(building);
                 }
+            }
+
+            if (e.key === "s") {
+                // save to file
+                e.preventDefault();
+
+                const exporter = new GLTFExporter();
+                exporter.parse(scene, (gltf) => {
+                    const blob = new Blob([JSON.stringify(gltf)], { type: "text/plain" });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "model.gltf";
+                    a.click();
+                },
+                    (error) => {
+                        console.error(error);
+                    });
             }
         }
 
@@ -102,6 +123,9 @@ export default class Input {
                     break;
                 case "building":
                     BuildingRenderer.renderBuilding(AssetManager.buildings.get(result)!, result);
+                    break;
+                case "map":
+                    CityRenderer.renderCity(AssetManager.maps.get(result)!);
                     break;
             }
 
