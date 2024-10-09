@@ -206,7 +206,17 @@ export default class SBCFileParser {
 
 
     console.log("Loaded", fileName);
-    console.log(JSON.stringify(cityData, null))
+
+    const importantCityData = {
+      version,
+      itemSets,
+      intersections,
+      streets,
+      buildings,
+      // sectors
+    }
+
+    console.log(JSON.stringify(importantCityData));
 
     AssetManager.maps.set(fileName, cityData);
   }

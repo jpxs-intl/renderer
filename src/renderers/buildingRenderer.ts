@@ -49,7 +49,8 @@ export default class BuildingRenderer {
                     // }
 
                     // floor
-                    if (tile.floor > 1) {
+                    if (tile.floor) {
+
                         const floor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[0])
                         // rotate the floor
                         floor.rotation.x = -Math.PI / 2;
@@ -61,25 +62,58 @@ export default class BuildingRenderer {
                     }
 
                     // positive x wall
-                    if (tile.edgeX > 1) {
-                        const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[4])
-                        wall.rotation.y = Math.PI
-                        wall.position.set(w + 0.5 - globalOffset - 0.001, h + 0.5, l).add(offset)
+                    if (tile.edgeX) {
 
-                        wall.name = `Wall (x) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+                        const innerWallActive = (tile.edgeX & 0b01) == 0b01
+                        const outerWallActive = (tile.edgeX & 0b10) == 0b10
 
-                        group.add(wall);
+                        if (innerWallActive) {
+                            const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[4])
+                            wall.rotation.y = Math.PI
+                            wall.position.set(w + 0.5 - globalOffset - 0.001, h + 0.5, l).add(offset)
+
+                            wall.name = `InnerWall (x) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+
+                            group.add(wall);
+                        }
+
+
+                        if (outerWallActive) {
+                            const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[4])
+                            wall.rotation.y = Math.PI
+                            wall.position.set(w + 0.5 - globalOffset - 0.001, h + 0.5, l).add(offset)
+
+                            wall.name = `OuterWall (x) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+
+                            group.add(wall);
+                        }
                     }
 
                     // positive z wall
-                    if (tile.edgeZ > 1) {
-                        const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[3])
-                        wall.rotation.y = Math.PI / 2
-                        wall.position.set(w, h + 0.5, l + 0.5 - globalOffset - 0.001).add(offset)
+                    if (tile.edgeZ) {
 
-                        wall.name = `Wall (z) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+                        const innerWallActive = (tile.edgeZ & 0b01) == 0b01
+                        const outerWallActive = (tile.edgeZ & 0b10) == 0b10
 
-                        group.add(wall);
+                        if (innerWallActive) {
+                            const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[3])
+                            wall.rotation.y = Math.PI / 2
+                            wall.position.set(w, h + 0.5, l + 0.5 - globalOffset - 0.001).add(offset)
+
+                            wall.name = `InnerWall (z) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+
+                            group.add(wall);
+                        }
+
+                        if (outerWallActive) {
+                            const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[3])
+                            wall.rotation.y = Math.PI / 2
+                            wall.position.set(w, h + 0.5, l - 0.5 - globalOffset - 0.001).add(offset)
+
+                            wall.name = `OuterWall (z) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+
+                            group.add(wall);
+                        }
                     }
 
 
