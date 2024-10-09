@@ -61,7 +61,7 @@ export default class BuildingRenderer {
                     if (tile.edgeX) {
                         const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), AssetManager.materials.get(`planeColor_4`))
                         wall.rotation.y = Math.PI
-                        wall.position.set(w + 0.5 - globalOffset - 0.001, h, l).add(offset)
+                        wall.position.set(w + 0.5 - globalOffset - 0.001, h + 0.5, l).add(offset)
                         group.add(wall);
                     }
 
@@ -69,10 +69,9 @@ export default class BuildingRenderer {
                     if (tile.edgeZ) {
                         const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), AssetManager.materials.get(`planeColor_3`))
                         wall.rotation.y = Math.PI / 2
-                        wall.position.set(w, h, l + 0.5 - globalOffset - 0.001).add(offset)
+                        wall.position.set(w, h + 0.5, l + 0.5 - globalOffset - 0.001).add(offset)
                         group.add(wall);
                     }
-
 
 
                     tileIter++;

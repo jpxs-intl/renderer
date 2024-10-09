@@ -143,7 +143,7 @@ export default class BlockRenderer {
         }
 
         // ceiling
-        if (block.ceiling == 1) {
+        if (block.ceiling != 0) {
             const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), AssetManager.materials.get(`planeColor_1`));
             ceiling.rotation.x = Math.PI / 2;
             ceiling.position.set(block.sizeX / 2, block.sizeY - globalOffset, block.sizeZ / 2)
@@ -187,7 +187,6 @@ export default class BlockRenderer {
         }
 
         let newVec = new THREE.Vector3();
-
         switch (rotationTable[rotation]) {
             case 0:
                 newVec.set(0, 0, 0)
