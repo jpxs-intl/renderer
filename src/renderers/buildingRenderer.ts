@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { BuildingFile } from "../typings/buildingFile";
 import BlockRenderer from "./blockRenderer";
 import AssetManager from "../assetManager";
+import boxMaterial from "./boxMaterial";
 
 export default class BuildingRenderer {
 
@@ -48,28 +49,36 @@ export default class BuildingRenderer {
                     // }
 
                     // floor
-                    if (tile.floor) {
-                        const floor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), AssetManager.materials.get(`planeColor_0`))
+                    if (tile.floor > 1) {
+                        const floor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[0])
                         // rotate the floor
                         floor.rotation.x = -Math.PI / 2;
                         floor.position.set(w + 0.5, h + globalOffset - 0.001, l + 0.5).add(offset)
+
+                        floor.name = `Floor ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
 
                         group.add(floor);
                     }
 
                     // positive x wall
-                    if (tile.edgeX) {
-                        const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), AssetManager.materials.get(`planeColor_4`))
+                    if (tile.edgeX > 1) {
+                        const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[4])
                         wall.rotation.y = Math.PI
                         wall.position.set(w + 0.5 - globalOffset - 0.001, h + 0.5, l).add(offset)
+
+                        wall.name = `Wall (x) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+
                         group.add(wall);
                     }
 
                     // positive z wall
-                    if (tile.edgeZ) {
-                        const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), AssetManager.materials.get(`planeColor_3`))
+                    if (tile.edgeZ > 1) {
+                        const wall = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), boxMaterial[3])
                         wall.rotation.y = Math.PI / 2
                         wall.position.set(w, h + 0.5, l + 0.5 - globalOffset - 0.001).add(offset)
+
+                        wall.name = `Wall (z) ${tileIter} ${l}x${w}x${h} | Edge: ${tile.floor} ${tile.edgeX} ${tile.edgeZ}`
+
                         group.add(wall);
                     }
 

@@ -78,7 +78,7 @@ export default class BlockRenderer {
 
         // floor
         if (block.floor != 0) {
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), AssetManager.materials.get(`planeColor_0`));
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), boxMaterial[0]);
             floor.rotation.x = -Math.PI / 2;
             floor.position.set(block.sizeX / 2, globalOffset, block.sizeZ / 2)
             wallgroup.add(floor);
@@ -87,7 +87,7 @@ export default class BlockRenderer {
 
         // ceiling
         if (block.ceiling != 0) {
-            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), AssetManager.materials.get(`planeColor_1`));
+            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX, block.sizeZ), boxMaterial[1]);
             ceiling.rotation.x = Math.PI / 2;
             ceiling.position.set(block.sizeX / 2, block.sizeY - globalOffset, block.sizeZ / 2)
             wallgroup.add(ceiling);
@@ -96,7 +96,7 @@ export default class BlockRenderer {
 
         // neg x | "wallx_far"
         if (block.wallNX != 0) {
-            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeZ - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_5`));
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeZ - (globalOffset * 2), block.sizeY), boxMaterial[5]);
             wall.rotation.y = Math.PI / 2;
             wall.position.set(globalOffset, block.sizeY / 2, block.sizeZ / 2)
             wallgroup.add(wall);
@@ -105,7 +105,7 @@ export default class BlockRenderer {
 
         // pos x | "wallx"
         if (block.wallPX != 0) {
-            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeZ - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_4`))
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeZ - (globalOffset * 2), block.sizeY), boxMaterial[4])
             wall.rotation.y = -Math.PI / 2;
             wall.position.set(block.sizeX - globalOffset, block.sizeY / 2, block.sizeZ / 2)
             wallgroup.add(wall);
@@ -114,7 +114,7 @@ export default class BlockRenderer {
 
         // neg z | "wallz_far"
         if (block.wallNZ != 0) {
-            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_2`))
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX - (globalOffset * 2), block.sizeY), boxMaterial[2])
             wall.position.set(block.sizeX / 2, block.sizeY / 2, globalOffset)
             wallgroup.add(wall);
             wall.name = `wallnz: ${blockName} | v: ${block.wallNZ}${name ? ` | ${name}` : ""}`;
@@ -122,7 +122,7 @@ export default class BlockRenderer {
 
         // pos z | "wallz"
         if (block.wallPZ != 0) {
-            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX - (globalOffset * 2), block.sizeY), AssetManager.materials.get(`planeColor_3`))
+            const wall = new THREE.Mesh(new THREE.PlaneGeometry(block.sizeX - (globalOffset * 2), block.sizeY), boxMaterial[3])
             wall.rotation.y = Math.PI;
             wall.position.set(block.sizeX / 2, block.sizeY / 2, block.sizeZ - globalOffset)
             wallgroup.add(wall);

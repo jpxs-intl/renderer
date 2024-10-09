@@ -39,7 +39,7 @@ export default class AssetManager {
 
     public static async downloadCSXFiles() {
         const files = [
-            "world.csx",
+            // "world.csx",
             "round.csx",
         ]
 
