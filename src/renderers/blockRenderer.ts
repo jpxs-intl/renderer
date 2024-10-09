@@ -3,24 +3,12 @@ import { BlockFile } from "../typings/blockFile";
 import BezierSurface from "./beizerSurface";
 import AssetManager from "../assetManager";
 import { hud } from "../hud";
+import boxMaterial from "./boxMaterial";
 
 
 export default class BlockRenderer {
 
     public static init() {
-        const planeColors = [
-            0xff0000,
-            0x00ff00,
-            0x0000ff,
-            0xffff00,
-            0xff00ff,
-            0x00ffff
-        ]
-
-        planeColors.forEach((color, index) => {
-            AssetManager.materials.set(`planeColor_${index}`, new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide }));
-        })
-
     }
 
     public static renderBlock(block: BlockFile, blockName: string, rotation: number, edgeX?: number, edgeZ?: number, group?: THREE.Group, textures?: string[], offset: THREE.Vector3 = new THREE.Vector3(0, 0, 0), name?: string) {
@@ -43,88 +31,43 @@ export default class BlockRenderer {
 
         // use the 8 vertices to create 6 plane geometries
 
-        const planeIds = [
+        const faceTriangles = [
             [
-                2, 1, 3, 0 // red
+                2, 1, 3, 0, 3, 1
             ],
             [
-                6, 5, 7, 4 // green
+                6, 5, 7, 4, 7, 5
             ],
             [
-                0, 1, 4, 5 // blue
+                0, 1, 4, 5, 4, 1
             ],
             [
-                2, 3, 6, 7 // yellow
+                2, 3, 6, 7, 6, 3
             ],
             [
-                0, 3, 4, 7 // magenta
+                0, 3, 4, 7, 4, 3
             ],
             [
-                1, 2, 5, 6 // cyan
+                1, 2, 5, 6, 5, 2
             ]
         ]
-
-
 
         const blockGroup = new THREE.Group();
 
         for (const box of block.boxes) {
+            const vertices = new Float32Array(box.vertices.flat());
+            const newBoxGeometry = new THREE.BoxGeometry();
+            newBoxGeometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+            newBoxGeometry.setIndex(faceTriangles.flat());
+            newBoxGeometry.computeVertexNormals()
 
-            const planeGeometries = planeIds.map((planeId) => {
-                const planeGeometry = new THREE.PlaneGeometry(1, 1);
-
-                const verts = new Float32Array(12);
-                let vertIndex = 0;
-                planeId.forEach((vertexId) => {
-                    verts[vertIndex] = box.vertices[vertexId][0];
-                    verts[vertIndex + 1] = box.vertices[vertexId][1];
-                    verts[vertIndex + 2] = box.vertices[vertexId][2];
-                    vertIndex += 3;
-                })
-                planeGeometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
-                return planeGeometry;
-            });
-
-            const boxGroup = new THREE.Group();
-
-            planeGeometries.forEach((planeGeometry, index) => {
-
-                let planeMaterial: THREE.MeshStandardMaterial;
-
-                if (textures) {
-
-                    if (AssetManager.materials.has(`planeTexture_${textures[index]}`)) {
-                        planeMaterial = AssetManager.materials.get(`planeTexture_${textures[index]}`)! as THREE.MeshStandardMaterial;
-                    } else {
-                        planeMaterial = new THREE.MeshStandardMaterial({
-                            side: THREE.DoubleSide,
-                            map: AssetManager.textures.get(textures[index])
-                        })
-
-                        AssetManager.materials.set(`planeTexture_${textures[index]}`, planeMaterial);
-                        hud.status = `Created material for texture ${textures[index]}`;
-                    }
-                } else {
-                    planeMaterial = AssetManager.materials.get(`planeColor_${index}`)! as THREE.MeshStandardMaterial;
-                }
-
-                const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-                planeMesh.name = `s: ${block.sizeX}, ${block.sizeY}, ${block.sizeZ} | p: ${index} | b: ${blockName}${name ? ` | ${name}` : ""}`;
-                boxGroup.add(planeMesh);
-            })
-
-            blockGroup.add(boxGroup);
+            const boxMesh = new THREE.Mesh(newBoxGeometry, boxMaterial);
+            blockGroup.add(boxMesh);
         }
 
-        let surfaces = block.surfaces.map((surface) => {
-            return BezierSurface.fromBlockSurface(surface, 0xffffff);
-        });
-
-        surfaces.forEach((surface) => {
-            //surface.position.add(offset);
-            //surface.position.add(newVec);
-            //surface.rotation.y = rotationTable[rotation] * (Math.PI / 180);
-            blockGroup!.add(surface);
+        block.surfaces.forEach((surface) => {
+            const bezierSurf = BezierSurface.fromBlockSurface(surface, 0xffffff);
+            blockGroup!.add(bezierSurf);
         });
 
         console.log(block);
